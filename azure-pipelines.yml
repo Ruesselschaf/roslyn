@@ -27,14 +27,14 @@ stages:
       vmImage: windows-2019
     steps:
     - pwsh: gi nonexistent.txt
-  - job: List_Roslyn_PRs
-    pool: server
-    steps:
-    - task: InvokeRESTAPI@1
-      inputs:
-        connectionType: 'connectedServiceName'
-        serviceConnection: 'dotnet'
-        method: 'GET'
-        urlSuffix: /pulls
-        waitForCompletion: false
-        header: '{}'
+  # - job: List_Roslyn_PRs
+  #   pool: server
+  #   steps:
+  #   - task: InvokeRESTAPI@1
+  #     inputs:
+  #       connectionType: 'connectedServiceName'
+  #       serviceConnection: 'dotnet'
+  #       method: 'GET'
+  #       urlSuffix: /pulls
+  #       waitForCompletion: false
+  #       header: '{}'
