@@ -15,17 +15,26 @@ pr:
 - demos/*
 
 stages:
-- template: eng/pipelines/build-windows-job.yml
-  parameters:
-    jobName: Build_Windows_Debug
-    testArtifactName: Transport_Artifacts_Windows_Debug
-    configuration: Debug
-    queueName: BuildPool.Windows.10.Amd64.Open
-- template: eng/pipelines/test-windows-job.yml
-  parameters:
-    testRunName: 'Test Windows CoreClr Debug'
-    jobName: Test_Windows_CoreClr_Debug
-    buildJobName: Build_Windows_Debug
-    testArtifactName: Transport_Artifacts_Windows_Debug
-    configuration: Debug
-    testArguments: -testCoreClr
+- stage: Stage_1
+  jobs:
+  - job: Say_Hello
+    pool:
+      vmImage: windows-2019
+    steps:
+    - pwsh: echo 'Hello Stage1'
+  - job: Get_Nonexistent_Item
+    pool:
+      vmImage: windows-2019
+    steps:
+    - pwsh: gi nonexistent.txt
+  - job: List_Roslyn_PRs
+    pool: server
+    steps:
+    - task: InvokeRESTAPI@1
+      inputs:
+        connectionType: 'connectedServiceName'
+        serviceConnection: 'dotnet'
+        method: 'GET'
+        urlSuffix: /pulls
+        waitForCompletion: false
+        header: '{}'
