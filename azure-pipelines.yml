@@ -17,6 +17,7 @@ pr:
 stages:
 
 - stage: Stage_1
+  dependsOn: []
   jobs:
   - job: Say_Hello
     pool:
@@ -33,6 +34,7 @@ stages:
     - pwsh: gi nonexistent1.txt
 
 - stage: Stage_2
+  dependsOn: []
   jobs:
   - job: Say_How_Are_You
     pool:
