@@ -24,6 +24,13 @@ stages:
     steps:
     - checkout: none
     - pwsh: echo 'Hello Stage_1'
+  - job: Get_Nonexistent_Item
+    dependsOn: Say_Hello
+    pool:
+      vmImage: windows-2019
+    steps:
+    - checkout: none
+    - pwsh: gi nonexistent1.txt
 
 - stage: Stage_2
   jobs:
@@ -34,11 +41,12 @@ stages:
     - checkout: none
     - pwsh: echo 'Hello Stage_2'
   - job: Get_Nonexistent_Item
+    dependsOn: Say_How_Are_You
     pool:
       vmImage: windows-2019
     steps:
     - checkout: none
-    - pwsh: gi nonexistent.txt
+    - pwsh: gi nonexistent2.txt
 
   # - job: List_Roslyn_PRs
   #   pool: server
