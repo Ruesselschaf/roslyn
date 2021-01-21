@@ -15,18 +15,31 @@ pr:
 - demos/*
 
 stages:
+
 - stage: Stage_1
   jobs:
   - job: Say_Hello
     pool:
       vmImage: windows-2019
     steps:
-    - pwsh: echo 'Hello Stage1'
+    - checkout: none
+    - pwsh: echo 'Hello Stage_1'
+
+- stage: Stage_2
+  jobs:
+  - job: Say_How_Are_You
+    pool:
+      vmImage: windows-2019
+    steps:
+    - checkout: none
+    - pwsh: echo 'Hello Stage_2'
   - job: Get_Nonexistent_Item
     pool:
       vmImage: windows-2019
     steps:
+    - checkout: none
     - pwsh: gi nonexistent.txt
+
   # - job: List_Roslyn_PRs
   #   pool: server
   #   steps:
