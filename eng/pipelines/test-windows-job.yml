@@ -22,43 +22,52 @@ parameters:
   type: string
   default: 'BuildPool.Windows.10.Amd64.Open'
 
-jobs:
-- job: ${{ parameters.jobName }}
+stages:
+- stage: ${{ parameters.jobName }}
   dependsOn: ${{ parameters.buildJobName }}
-  pool:
-    name: NetCorePublic-Pool
-    queue: ${{ parameters.queueName }}
-  timeoutInMinutes: 120
-  steps:
-    - checkout: none
+  jobs:
+  - job: Say_Hello
+    pool:
+      vmImage: windows-2019
+    steps:
+    - pwsh: echo "Hello AzDo Stages"
+      displayName: Run echo script
 
-    - task: DownloadPipelineArtifact@2
-      displayName: Download Test Payload
-      inputs:
-        artifact: ${{ parameters.testArtifactName }}
-        path: '$(Build.SourcesDirectory)'
+  - job: ${{ parameters.jobName }}
+    pool:
+      name: NetCorePublic-Pool
+      queue: ${{ parameters.queueName }}
+    timeoutInMinutes: 120
+    steps:
+      - checkout: none
 
-    - task: BatchScript@1
-      displayName: Rehydrate Unit Tests Environment
-      inputs:
-        filename: rehydrate-all.cmd
+      - task: DownloadPipelineArtifact@2
+        displayName: Download Test Payload
+        inputs:
+          artifact: ${{ parameters.testArtifactName }}
+          path: '$(Build.SourcesDirectory)'
 
-    - task: PowerShell@2
-      displayName: Run Unit Tests
-      inputs:
-        filePath: eng/build.ps1
-        arguments: -ci -configuration ${{ parameters.configuration }} ${{ parameters.testArguments }} -collectDumps
+      - task: BatchScript@1
+        displayName: Rehydrate Unit Tests Environment
+        inputs:
+          filename: rehydrate-all.cmd
 
-    - task: PublishTestResults@2
-      displayName: Publish xUnit Test Results
-      inputs:
-        testRunner: XUnit
-        testResultsFiles: '$(Build.SourcesDirectory)\artifacts\TestResults\${{ parameters.configuration }}\*.xml'
-        mergeTestResults: true
-        testRunTitle: '${{ parameters.testRunName }}'
-      condition: always()
+      - task: PowerShell@2
+        displayName: Run Unit Tests
+        inputs:
+          filePath: eng/build.ps1
+          arguments: -ci -configuration ${{ parameters.configuration }} ${{ parameters.testArguments }} -collectDumps
 
-    - template: publish-logs.yml
-      parameters:
-        configuration: ${{ parameters.configuration }}
-        jobName: ${{ parameters.jobName }}
+      - task: PublishTestResults@2
+        displayName: Publish xUnit Test Results
+        inputs:
+          testRunner: XUnit
+          testResultsFiles: '$(Build.SourcesDirectory)\artifacts\TestResults\${{ parameters.configuration }}\*.xml'
+          mergeTestResults: true
+          testRunTitle: '${{ parameters.testRunName }}'
+        condition: always()
+
+      - template: publish-logs.yml
+        parameters:
+          configuration: ${{ parameters.configuration }}
+          jobName: ${{ parameters.jobName }}
